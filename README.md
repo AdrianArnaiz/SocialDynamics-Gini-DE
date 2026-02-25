@@ -7,13 +7,19 @@ This toolkit bridges **inequality theory** and **graph spectral analysis** to di
 **Core Insight:** The Gini Index (a global $L_1$-dispersion measure) and Dirichlet Energy (a local $L_2$-smoothness measure) capture **orthogonal dimensions** of networked populations:
 - **Gini Index**: How opinions/resources are distributed across people (composition)
 - **Dirichlet Energy**: How those values align across social ties (structural tension)
-- **Rayleigh Quotient**: Normalized roughness, revealing clustering quality and diffusion rates
+- **Rayleigh Quotient**: Normalized roughness, revealing the **efficiency** of structure-signal coupling
 
-**Why This Matters:** Standard network analysis tools either focus on topology (modularity, centrality) or treat node attributes as independent features. This framework **couples structure and signal**, enabling detection of:
-- Echo chambers (high diversity, low structural tension)
-- Polarized integration (high diversity, high tension)
-- Consensus emergence (low diversity, variable tension)
-- Homophily vs. heterophily after normalization
+**Master Map of Social States:** This framework identifies **four archetypal network states**:
+1. **Consensus** (Low diversity, low tension) — Stable but stagnant
+2. **Conflict** (High diversity, high tension) — Pre-revolutionary, toxic
+3. **Fracture** (High diversity, low tension) — Echo chambers, cold polarization
+4. **Mediation** (Medium diversity, moderate tension, optimal RQ) — Diverse yet cohesive (via bridge nodes)
+
+**Why This Matters:** Standard network analysis tools either focus on topology (modularity, centrality) or treat node attributes as independent features. This framework **couples structure and signal**, enabling:
+- Detection of structural fracture masked by low RQ (distinguishing Fracture from Consensus)
+- Design of stable diverse networks via bridge-node mediation
+- Prediction of network instability and transition paths
+- Homophily vs. heterophily diagnostics with normalization
 
 ---
 
@@ -52,7 +58,7 @@ Applied use cases demonstrating the framework.
 
 | Script | Purpose |
 |--------|---------|
-| [use_case_sn.py](use_case_sn.py) | **Opinion dynamics sandbox**: DeGroot averaging vs. bounded-confidence models, showing DE/RQ evolution under consensus vs. polarization |
+| [use_case_sn.py](use_case_sn.py) | **Master Map scenarios**: Opinion dynamics (DeGroot vs. bounded-confidence), 4-state transitions (Consensus → Conflict → Fracture → Mediation), bridge-node stabilization |
 | [rq_gi_quadrants_experiments.py](rq_gi_quadrants_experiments.py) | **4-quadrant diagnostic**: Maps (Diversity, Tension) space, topology sweeps, radicalization trajectories, phase diagrams over mixing/intolerance |
 | [test_gdrq_1.py](test_gdrq_1.py) | Integration test for `gdrq_1` package |
 | [test_csbm.py](test_csbm.py) | CSBM generator validation |
@@ -143,16 +149,50 @@ $$
 
 where $\lambda_2$ (spectral gap) controls exponential smoothing. Gini index admits an exponential upper envelope via $L_1/L_2$ conversion.
 
-### 4. Social Network Diagnostics
+### 4. Master Map of Social Network States
 
-| Scenario | Gini | Dirichlet Energy | Interpretation |
-|----------|------|------------------|----------------|
-| **Consensus** | Low | Low | Homogeneous, relaxed network |
-| **Echo Chambers** | High | Low | Diversity isolated (homophily) |
-| **Polarized Integration** | High | High | Diversity in contact (friction) |
-| **Radicalization** | High | High | Pre-fracture tension state |
+This framework defines four **archetypal social states** along two dimensions (Diversity and Tension), with RQ as the critical third dimension:
 
-Diagnostic tool: `rq_gi_quadrants_experiments.py` produces phase diagrams over $(p_{\text{out}}, \tau_{\text{intolerance}})$.
+| State | Diversity<br/>(Gini/Var) | Tension<br/>(Dirichlet) | RQ<br/>(Efficiency) | Diagnosis | Outcome |
+|-------|---------------------------|------------------------|--------------------|-----------|---------|
+| **1. Consensus** | Low | Low | Low/Stable | Homogeneity | Stable but stagnant |
+| **2. Conflict** | High | High | Maximum | Radicalization | Toxicity or revolution |
+| **3. Fracture** | High | Low | Minimum | Segregation (Echo Chambers) | Cold polarization |
+| **4. Mediation** | Medium–High | Moderate | Optimal | Pluralism with bridges | Slow evolution + cohesion |
+
+**Key Insights:**
+- **Low RQ ≠ Peace**: A low Rayleigh Quotient combined with high Gini signals **structural fracture**, not stability (Fracture vs. Consensus).
+- **Dirichlet Energy as cost of connection**: In Conflict, large potential jumps concentrate cost unsustainably. In Mediation, bridge nodes decompose tension into smaller gradients.
+- **RQ optimum**: The Mediation state balances diversity and tension efficiently, preventing both total consensus stagnation and revolutionary collapse.
+
+**Diagnostic tool:** `rq_gi_quadrants_experiments.py` operationalizes this map via:
+- Quadrant archetypes (4 toy scenarios)
+- Topology sweeps (fixed opinions, varying network mixing)
+- Transition trajectories (radicalization → fracture → mediation)
+- Phase diagrams over $(p_{\text{out}}, \tau_{\text{intolerance}})$
+- Dynamics evolution (DeGroot vs. bounded-confidence)
+
+---
+
+## The Mediation Archetype: Bridge Nodes as Stabilizers
+
+**Problem**: How do diverse networks avoid both revolutionary collapse (Conflict) and segregation (Fracture)?
+
+**Solution**: Introduce **intermediate-opinion bridge nodes** connecting opposed factions.
+
+**Mechanism**:
+- Bridge nodes hold moderate positions (e.g., $x=0$ between camps at $x=\pm 1$)
+- They connect both camps, reducing the density of direct A-B conflict edges
+- Dirichlet Energy is **decomposed** into smaller gradients across bridge nodes, lowering peak tension
+- The Rayleigh Quotient reaches an **efficiency optimum**: diversity persists, but tension remains manageable
+
+**Result**: The network evolves slowly toward consensus without explosive polarization or cryogenic segregation.
+
+**Experiment**: `use_case_sn.py:scenario_mediation()` compares:
+- **Neutral mediators** ($x=0$): Symmetrically balanced
+- **Biased mediators** ($x=0.4$ or $-0.4$): Asymmetric influence (shows one-sided drift)
+
+This archetype is operationalized in the Master Map's **4th state** and is central to understanding stable, diverse networks in practice.
 
 ---
 
